@@ -23,12 +23,10 @@ from collections import defaultdict
 # no spaces
 # ~ is epsilon
 
-productions = """S->Bc
-S->DB
-B->ab
-B->cS
-D->d
-D->~"""
+productions = """A->a
+B->b
+S->ASB
+S->~"""
 
 # Look over the productions, construct sets of terminals and non-terminals
 terminals = set()
@@ -73,7 +71,14 @@ for i in range(len(nonterminals)):
 
                 # if prefix of Y is nullable
                 for j in range(len(Y) - 1):
-                    if "~" in first[Y[j]]:
+                    nullable = 0
+                    for i in range(j-1):
+                        if "~" in first[Y[j]]:
+                            nullable = 1
+                        else:
+                            nullable = 0
+                            break
+                    if nullable:
                         first[X].update(first[Y[j+1]] - set("~"))
 
 # We should be done now
