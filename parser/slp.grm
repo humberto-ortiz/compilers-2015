@@ -1,0 +1,39 @@
+structure A = Absyn
+%%
+%term
+    EOF
+  | ID of string
+  | INT of int
+  | COMMA | SEMICOLON | LPAREN | RPAREN
+  | PLUS | MINUS | TIMES | DIVIDE
+  | ASSIGN | PRINT
+
+%nonterm  stm of A.stm | exp of A.exp | exps of A.exp list | prog of A.stm
+
+%right SEMICOLON
+%pos int
+%verbose
+%start prog
+%eop EOF
+%noshift EOF
+
+%name SLP
+
+%%
+prog: stm                        (stm)
+
+stm	: stm SEMICOLON stm      (A.CompoundStm(stm1,stm2))
+stm : ID ASSIGN exp              (A.AssignStm(ID, exp))
+stm : PRINT LPAREN exps RPAREN   (A.PrintStm(exps))
+
+exps : exp                       ( exp :: nil )
+exps : exp COMMA exps            ( exp :: exps )
+
+exp: INT                         (A.NumExp(INT))
+exp: ID                          (A.IdExp(ID))
+exp: exp PLUS exp                (A.OpExp(exp1,A.Plus,exp2))
+exp: exp MINUS exp               (A.OpExp(exp1,A.Minus,exp2))
+exp: exp TIMES exp               (A.OpExp(exp1,A.Times,exp2))
+exp: exp DIVIDE exp              (A.OpExp(exp1,A.Div,exp2))
+exp: stm COMMA exp               (A.EseqExp(stm,exp))
+exp: LPAREN exp RPAREN           (exp)

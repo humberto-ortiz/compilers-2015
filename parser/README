@@ -1,0 +1,27 @@
+I can parse and interpret simple straight line programs.
+
+$ cat prog.slp
+a := 5 + 3;
+b := (print (a, a-1), 10*a);
+print (b)
+
+$ rlwrap sml
+Standard ML of New Jersey v110.76 [built: Mon Jul  7 23:25:08 2014]
+- CM.make "sources.cm";
+[autoloading]
+[library $smlnj/cm/cm.cm is stable]
+...
+[loading (sources.cm):parse.sml]
+[New bindings added.]
+val it = true : bool
+
+- val prog = Parse.parse "prog.slp";
+val prog =
+  CompoundStm (AssignStm ("a",OpExp #),CompoundStm (PrintStm #,PrintStm #))
+  : Absyn.stm
+
+- Interp.interp prog;
+8
+7
+80
+val it = () : unit
