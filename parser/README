@@ -1,5 +1,30 @@
 I can parse and interpret simple straight line programs.
 
+absyn.sml - abstract syntax for straight line programs. This is basically
+slp.sml from chapter 1.
+
+errormsg.sml - code for errors, from chapter 4.
+
+interp.sml - my own interpreter for straight line programs.
+
+parse.sml - parser structure from chapter 4, with modifications to the name
+of the structures (substitute SLP for Tiger), and the start symbol.
+
+slp.grm - ml-yacc input for straight line program parser, from Program 4.7,
+modified to work with the rest of our code.
+
+slp.lex - ml-lex input for straight line program tokenizer.
+
+sources.cm - Makefile for parser.
+
+I have included two example programs: deriv-3.2.slp and prog.slp.
+
+The code in deriv-3.2.slp parses correctly, but fails interpretation
+(c is undefined). This is the example code the book uses for Derivation
+3.2.
+
+The code in prog.slp parses and runs! It's the example program from chapter 1.
+
 $ cat prog.slp
 a := 5 + 3;
 b := (print (a, a-1), 10*a);
