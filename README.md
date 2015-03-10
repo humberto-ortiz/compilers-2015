@@ -19,3 +19,6 @@ Code for example problems
  See the README for usage instructions. You need to fix some shift/reduce
  conflicts.
  
+ tiger-parser/ - A skeleton parser for tiger, using the code from
+ Chapter 3 and the examples we did in class today. I added SEMICOLON,
+ so you can write longer test programs (like all.tig).
