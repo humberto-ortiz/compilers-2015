@@ -11,7 +11,7 @@
   | BREAK | NIL
   | FUNCTION | VAR | TYPE 
 
-%nonterm  exp | program
+%nonterm  exp | program | expseq
 
 %pos int
 %verbose
@@ -46,4 +46,7 @@ exp: STRING			()
 
 exp: exp PLUS exp		()
 
-exp: exp SEMICOLON exp		()
+exp: LPAREN expseq RPAREN ()
+
+expseq: exp ()
+expseq: exp SEMICOLON expseq		()
