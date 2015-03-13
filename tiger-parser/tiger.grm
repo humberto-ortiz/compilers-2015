@@ -1,3 +1,4 @@
+structure A = Absyn
 %%
 %term
     EOF 
@@ -11,7 +12,7 @@
   | BREAK | NIL
   | FUNCTION | VAR | TYPE 
 
-%nonterm  exp | program | expseq
+%nonterm  exp of A.exp | program of A.exp
 
 %pos int
 %verbose
@@ -37,16 +38,11 @@
  *  to replace the two dummy productions below with an actual grammar. 
  *)
 
-program	: exp				()
+program	: exp				(exp)
 
 	
-exp: INT			()
+exp: INT			(A.IntExp INT)
 
-exp: STRING			()
+exp: STRING			(A.StringExp (STRING, STRINGleft))
 
-exp: exp PLUS exp		()
-
-exp: LPAREN expseq RPAREN ()
-
-expseq: exp ()
-expseq: exp SEMICOLON expseq		()
+exp: exp PLUS exp		(A.OpExp {left=exp1, oper=A.PlusOp, right=exp2, pos=exp1left})

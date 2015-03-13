@@ -1,9 +1,13 @@
 Group is
 
+absyn.sml
 tiger.lex
 errormsg.sml
-parsetest.sml
+parse.sml
 tiger.grm
+symbol.sml
+table.sig
+table.sml
 $/smlnj-lib.cm
 $/basis.cm
 $/ml-yacc-lib.cm
