@@ -1,4 +1,5 @@
 structure A = Absyn
+
 %%
 %term
     EOF 
@@ -31,18 +32,20 @@ structure A = Absyn
 %value INT (1)
 %value STRING ("")
 
-%%
+%left PLUS MINUS
+%left TIMES DIVIDE
 
-(* This is a skeleton grammar file, meant to illustrate what kind of
- * declarations are necessary above the %% mark.  Students are expected
- *  to replace the two dummy productions below with an actual grammar. 
- *)
+%%
 
 program	: exp				(exp)
 
 	
+exp: NIL		(A.NilExp)
+
 exp: INT			(A.IntExp INT)
 
 exp: STRING			(A.StringExp (STRING, STRINGleft))
 
 exp: exp PLUS exp		(A.OpExp {left=exp1, oper=A.PlusOp, right=exp2, pos=exp1left})
+
+exp: exp TIMES exp		(A.OpExp {left=exp1, oper=A.TimesOp, right=exp2, pos=exp1left})

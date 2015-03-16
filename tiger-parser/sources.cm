@@ -8,6 +8,7 @@ tiger.grm
 symbol.sml
 table.sig
 table.sml
+prabsyn.sml
 $/smlnj-lib.cm
 $/basis.cm
 $/ml-yacc-lib.cm
