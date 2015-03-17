@@ -2,18 +2,24 @@ structure A = Absyn
 
 %%
 %term
-    EOF 
+    EOF
   | ID of string
-  | INT of int | STRING of string 
-  | COMMA | COLON | SEMICOLON | LPAREN | RPAREN | LBRACK | RBRACK 
-  | LBRACE | RBRACE | DOT 
+  | INT of int | STRING of string
+  | COMMA | COLON | SEMICOLON | LPAREN | RPAREN | LBRACK | RBRACK
+  | LBRACE | RBRACE | DOT
   | PLUS | MINUS | TIMES | DIVIDE | EQ | NEQ | LT | LE | GT | GE
   | AND | OR | ASSIGN
-  | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF 
+  | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF
   | BREAK | NIL
-  | FUNCTION | VAR | TYPE 
+  | FUNCTION | VAR | TYPE
+  | UMINUS
 
-%nonterm  exp of A.exp | program of A.exp
+%nonterm  exp of A.exp
+  | program of A.exp
+  | lvalue of A.var
+  | vardec of A.dec
+  | dec of A.dec
+  | declist of A.dec list
 
 %pos int
 %verbose
@@ -23,7 +29,7 @@ structure A = Absyn
 
 %name Tiger
 
-%keyword WHILE FOR TO BREAK LET IN END FUNCTION VAR TYPE ARRAY IF THEN ELSE 
+%keyword WHILE FOR TO BREAK LET IN END FUNCTION VAR TYPE ARRAY IF THEN ELSE
 	DO OF NIL
 
 %prefer THEN ELSE LPAREN
@@ -32,14 +38,19 @@ structure A = Absyn
 %value INT (1)
 %value STRING ("")
 
+%nonassoc EQ NEQ LT LE GT GE
 %left PLUS MINUS
 %left TIMES DIVIDE
+%right UMINUS
 
 %%
 
 program	: exp				(exp)
 
-	
+exp: lvalue (A.VarExp lvalue)
+
+exp: MINUS exp %prec UMINUS (A.OpExp {left=A.IntExp ~1, oper=A.TimesOp, right=exp, pos=MINUSleft})
+
 exp: NIL		(A.NilExp)
 
 exp: INT			(A.IntExp INT)
@@ -47,5 +58,21 @@ exp: INT			(A.IntExp INT)
 exp: STRING			(A.StringExp (STRING, STRINGleft))
 
 exp: exp PLUS exp		(A.OpExp {left=exp1, oper=A.PlusOp, right=exp2, pos=exp1left})
-
+exp: exp MINUS exp		(A.OpExp {left=exp1, oper=A.MinusOp, right=exp2, pos=exp1left})
 exp: exp TIMES exp		(A.OpExp {left=exp1, oper=A.TimesOp, right=exp2, pos=exp1left})
+exp: exp DIVIDE exp		(A.OpExp {left=exp1, oper=A.DivideOp, right=exp2, pos=exp1left})
+
+(* let *)
+(* This isn't correct, should be a sequence of exp, not a single exp *)
+exp: LET declist IN exp END  (A.LetExp {decs=declist, body=exp, pos=LETleft})
+
+(* lvalues *)
+lvalue: ID (A.SimpleVar(Symbol.symbol ID, IDleft))
+
+(* declarations *)
+declist: dec  (dec :: nil)
+declist: dec declist  (dec :: declist)
+
+dec: vardec (vardec)
+
+vardec: VAR ID ASSIGN exp (A.VarDec {name=Symbol.symbol ID, init=exp, pos=VARleft, escape= ref true, typ=NONE})
