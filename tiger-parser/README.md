@@ -37,3 +37,28 @@ OpExp(PlusOp,
   IntExp(4)))
 val it = () : unit
 ```
+
+2015/03/17 - Today we extended the grammar to parse a variant of let
+expressions.
+
+It's broken because the let should have an expression secuence between
+the in and the end, but I only allow a single expression.
+
+Do now: fix it, then finish your homework.
+
+```
+- PrintAbsyn.print (TextIO.stdOut, Parse.parse "let.tig");
+[autoloading]
+[autoloading done]
+LetExp([
+ VarDec(a,true,NONE,
+  IntExp(5)),
+ VarDec(b,true,NONE,
+  StringExp("Hello"))],
+ OpExp(PlusOp,
+  VarExp(
+   SimpleVar(a)),
+  VarExp(
+   SimpleVar(b))))
+val it = () : unit
+```
