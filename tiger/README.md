@@ -12,7 +12,7 @@ Running the parser:
 - Parse.parse "plus.tig";
 val it = OpExp {left=IntExp 3,oper=PlusOp,pos=2,right=StringExp ("Hello",6)}
   : Absyn.exp
-- 
+-
 ```
 
 I added the pretty printer to the project, so you can examine larger
@@ -62,3 +62,29 @@ LetExp([
    SimpleVar(b))))
 val it = () : unit
 ```
+2015/03/23 - HOZ
+
+A bunch of changes, including renaming the directory to just "tiger".
+Added a working semantic analysis phase, see env.sml, types.sml, semant.sml.
+Most of the code is given in Chapter 6, but we only get the signature for
+ENV, and the details of the program analysis are not quite down to working
+code.
+
+To run a semantic analysis:
+
+```
+- CM.make "sources.cm";
+[scanning sources.cm]
+...
+val it = true : bool
+- Semant.transProg (Parse.parse "sum.tig");
+val it = () : unit
+- Semant.transProg (Parse.parse "plus.tig");
+plus.tig:1.3:integer required
+val it = () : unit
+- Semant.transProg (Parse.parse "let.tig");
+let.tig0.0:Can't typecheck this yet
+val it = () : unit
+```
+
+Guess what you have to do next ;-).
