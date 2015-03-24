@@ -1,5 +1,4 @@
 structure A = Absyn
-
 %%
 %term
     EOF
@@ -18,8 +17,14 @@ structure A = Absyn
   | program of A.exp
   | lvalue of A.var
   | vardec of A.dec
+  | tyseq of {name:Symbol.symbol,
+	            ty:A.ty,
+              pos:pos} list
+  | tydec of {name:Symbol.symbol, ty:A.ty, pos:pos}
+  | ty of A.ty
   | dec of A.dec
   | declist of A.dec list
+  | expseq of (A.exp * pos) list
 
 %pos int
 %verbose
@@ -57,14 +62,14 @@ exp: INT			(A.IntExp INT)
 
 exp: STRING			(A.StringExp (STRING, STRINGleft))
 
-exp: exp PLUS exp		(A.OpExp {left=exp1, oper=A.PlusOp, right=exp2, pos=exp1left})
-exp: exp MINUS exp		(A.OpExp {left=exp1, oper=A.MinusOp, right=exp2, pos=exp1left})
-exp: exp TIMES exp		(A.OpExp {left=exp1, oper=A.TimesOp, right=exp2, pos=exp1left})
-exp: exp DIVIDE exp		(A.OpExp {left=exp1, oper=A.DivideOp, right=exp2, pos=exp1left})
+exp: exp PLUS exp		(A.OpExp {left=exp1, oper=A.PlusOp, right=exp2, pos=PLUSleft})
+exp: exp TIMES exp		(A.OpExp {left=exp1, oper=A.TimesOp, right=exp2, pos=TIMESleft})
+
+exp: lvalue ASSIGN exp (A.AssignExp {var=lvalue, exp=exp, pos=lvalueleft})
 
 (* let *)
-(* This isn't correct, should be a sequence of exp, not a single exp *)
-exp: LET declist IN exp END  (A.LetExp {decs=declist, body=exp, pos=LETleft})
+exp: LET declist IN END  (A.LetExp {decs=declist, body=A.SeqExp([]), pos=LETleft})
+exp: LET declist IN expseq END  (A.LetExp {decs=declist, body=A.SeqExp(expseq), pos=LETleft})
 
 (* lvalues *)
 lvalue: ID (A.SimpleVar(Symbol.symbol ID, IDleft))
@@ -74,5 +79,17 @@ declist: dec  (dec :: nil)
 declist: dec declist  (dec :: declist)
 
 dec: vardec (vardec)
+dec: tyseq (A.TypeDec tyseq)
 
 vardec: VAR ID ASSIGN exp (A.VarDec {name=Symbol.symbol ID, init=exp, pos=VARleft, escape= ref true, typ=NONE})
+vardec: VAR ID COLON ID ASSIGN exp (A.VarDec {name=Symbol.symbol ID1, init=exp, pos=VARleft, escape= ref true, typ=SOME (Symbol.symbol ID2, ID2left)})
+
+tyseq: tydec (tydec::nil)
+tyseq: tydec tyseq (tydec::tyseq)
+
+tydec: TYPE ID EQ ty ({name=Symbol.symbol ID1, ty=ty, pos=TYPEleft})
+
+ty: ID (A.NameTy (Symbol.symbol ID, IDleft))
+
+expseq: exp ((exp, expleft) :: nil)
+expseq: exp SEMICOLON expseq ((exp, expleft) :: expseq)

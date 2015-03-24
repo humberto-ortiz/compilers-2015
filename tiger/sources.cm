@@ -9,7 +9,9 @@ symbol.sml
 table.sig
 table.sml
 prabsyn.sml
+types.sml
+env.sml
+semant.sml
 $/smlnj-lib.cm
 $/basis.cm
 $/ml-yacc-lib.cm
-
