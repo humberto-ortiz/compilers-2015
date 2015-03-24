@@ -15,10 +15,10 @@ Code for example problems
  programs. You need to implement update and the rest of interpexp and
  interpstm.
 
- parser/ - a nearly correct parser and interpreter for straight line programs.
+ slp/ - a nearly correct parser and interpreter for straight line programs.
  See the README for usage instructions. You need to fix some shift/reduce
  conflicts.
- 
- tiger-parser/ - A skeleton parser for tiger, using the code from
- Chapter 3 and the examples we did in class today. I added SEMICOLON,
- so you can write longer test programs (like all.tig).
+
+ tiger/ - A skeleton compiler for tiger, using the code from
+ Chapter 3-6 and the examples we did in class. See the README.md there for more
+ details and examples.
