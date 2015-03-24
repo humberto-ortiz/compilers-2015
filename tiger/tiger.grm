@@ -62,8 +62,10 @@ exp: INT			(A.IntExp INT)
 
 exp: STRING			(A.StringExp (STRING, STRINGleft))
 
-exp: exp PLUS exp		(A.OpExp {left=exp1, oper=A.PlusOp, right=exp2, pos=PLUSleft})
+exp: exp PLUS exp     (A.OpExp {left=exp1, oper=A.PlusOp, right=exp2, pos=PLUSleft})
+exp: exp MINUS exp		(A.OpExp {left=exp1, oper=A.MinusOp, right=exp2, pos=MINUSleft})
 exp: exp TIMES exp		(A.OpExp {left=exp1, oper=A.TimesOp, right=exp2, pos=TIMESleft})
+exp: exp DIVIDE exp		(A.OpExp {left=exp1, oper=A.DivideOp, right=exp2, pos=DIVIDEleft})
 
 exp: lvalue ASSIGN exp (A.AssignExp {var=lvalue, exp=exp, pos=lvalueleft})
 
@@ -81,13 +83,16 @@ declist: dec declist  (dec :: declist)
 dec: vardec (vardec)
 dec: tyseq (A.TypeDec tyseq)
 
-vardec: VAR ID ASSIGN exp (A.VarDec {name=Symbol.symbol ID, init=exp, pos=VARleft, escape= ref true, typ=NONE})
-vardec: VAR ID COLON ID ASSIGN exp (A.VarDec {name=Symbol.symbol ID1, init=exp, pos=VARleft, escape= ref true, typ=SOME (Symbol.symbol ID2, ID2left)})
+vardec: VAR ID ASSIGN exp (A.VarDec {name=Symbol.symbol ID, init=exp,
+                           pos=VARleft, escape= ref true, typ=NONE})
+vardec: VAR ID COLON ID ASSIGN exp (A.VarDec {name=Symbol.symbol ID1, init=exp,
+                                    pos=VARleft, escape= ref true,
+                                    typ=SOME (Symbol.symbol ID2, ID2left)})
 
 tyseq: tydec (tydec::nil)
 tyseq: tydec tyseq (tydec::tyseq)
 
-tydec: TYPE ID EQ ty ({name=Symbol.symbol ID1, ty=ty, pos=TYPEleft})
+tydec: TYPE ID EQ ty ({name=Symbol.symbol ID, ty=ty, pos=TYPEleft})
 
 ty: ID (A.NameTy (Symbol.symbol ID, IDleft))
 
