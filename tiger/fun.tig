@@ -1,0 +1,7 @@
+let
+  var a : int := 0
+  function foo(a:int):int = a + a
+in
+  a := 43;
+  foo(foo(a))
+end

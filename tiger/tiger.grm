@@ -25,6 +25,11 @@ structure A = Absyn
   | dec of A.dec
   | declist of A.dec list
   | expseq of (A.exp * pos) list
+  | explist of A.exp list
+  | fundec of A.fundec
+  | funseq of A.fundec list
+  | tyfield of A.field
+  | tyfields of A.field list
 
 %pos int
 %verbose
@@ -54,6 +59,9 @@ program	: exp				(exp)
 
 exp: lvalue (A.VarExp lvalue)
 
+(* function calls *)
+exp: ID LPAREN explist RPAREN (A.CallExp  {func=Symbol.symbol ID, args=explist, pos=IDleft})
+
 exp: MINUS exp %prec UMINUS (A.OpExp {left=A.IntExp ~1, oper=A.TimesOp, right=exp, pos=MINUSleft})
 
 exp: NIL		(A.NilExp)
@@ -73,6 +81,10 @@ exp: lvalue ASSIGN exp (A.AssignExp {var=lvalue, exp=exp, pos=lvalueleft})
 exp: LET declist IN END  (A.LetExp {decs=declist, body=A.SeqExp([]), pos=LETleft})
 exp: LET declist IN expseq END  (A.LetExp {decs=declist, body=A.SeqExp(expseq), pos=LETleft})
 
+(* expression lists, for function actual arguments *)
+explist: exp (exp::nil)
+explist: exp COMMA explist (exp::explist)
+
 (* lvalues *)
 lvalue: ID (A.SimpleVar(Symbol.symbol ID, IDleft))
 
@@ -82,6 +94,7 @@ declist: dec declist  (dec :: declist)
 
 dec: vardec (vardec)
 dec: tyseq (A.TypeDec tyseq)
+dec: funseq (A.FunctionDec funseq)
 
 vardec: VAR ID ASSIGN exp (A.VarDec {name=Symbol.symbol ID, init=exp,
                            pos=VARleft, escape= ref true, typ=NONE})
@@ -96,5 +109,23 @@ tydec: TYPE ID EQ ty ({name=Symbol.symbol ID, ty=ty, pos=TYPEleft})
 
 ty: ID (A.NameTy (Symbol.symbol ID, IDleft))
 
+(* formal arguments to functions *)
+tyfields: tyfield (tyfield::nil)
+tyfields: tyfield COMMA tyfields (tyfield::tyfields)
+
+(* a formal argument must be typed *)
+tyfield: ID COLON ID ({name = Symbol.symbol ID1,
+  escape=ref true,
+  typ=Symbol.symbol ID2,
+  pos=ID1left})
+
 expseq: exp ((exp, expleft) :: nil)
 expseq: exp SEMICOLON expseq ((exp, expleft) :: expseq)
+
+funseq: fundec (fundec::nil)
+funseq: fundec funseq (fundec::funseq)
+
+(* function declarations, ours must have one argument and return one value *)
+(* this parser is more general, but we can skip the typechecking for more complex cases *)
+fundec: FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp  ({name=Symbol.symbol ID1, params=tyfields,
+                                     result=SOME(Symbol.symbol ID2, ID2left), body=exp, pos=FUNCTIONleft})
