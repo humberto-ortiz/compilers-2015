@@ -8,6 +8,9 @@ tiger.grm
 symbol.sml
 table.sig
 table.sml
+temp.sig
+temp.sml
+translate.sml
 prabsyn.sml
 types.sml
 env.sml

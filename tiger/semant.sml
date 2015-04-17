@@ -3,9 +3,6 @@ structure Semant :
 struct
   structure A = Absyn
 
-  (* dummy translate for chapter 5 *)
-  structure Translate = struct type exp = unit end
-
   type expty = {exp: Translate.exp, ty: Types.ty}
   type venv = Env.enventry Symbol.table
   type tenv = Types.ty Symbol.table
