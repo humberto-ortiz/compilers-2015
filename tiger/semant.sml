@@ -26,21 +26,6 @@ struct
        {ty=Types.INT, exp=()})
        | trexp (A.IntExp _) = {ty=Types.INT, exp=()}
        | trexp (A.StringExp (_,_)) = {ty=Types.STRING, exp=()}
-       | trexp (A.LetExp {decs, body, pos}) =
-                  let
-		    fun delosenv (venv, tenv, nil) = {tenv=tenv, venv=venv}
-		    | delosenv (venv, tenv, dec::decs) =
-		       let
-                         val {tenv=newtenv,venv=newvenv} = transDec(venv,tenv,dec)
-			in
-			 delosenv (newvenv, newtenv, decs)
-                       end
-		   in
-                     let val {tenv=newtenv, venv=newvenv} = delosenv(venv,tenv,decs)
-		     in
-		       transExp (newvenv, newtenv) body
-                     end
-		  end
        | trexp _ = {ty=Types.UNIT, exp=ErrorMsg.error 0 "Can't typecheck this yet"}
     in
       trexp
