@@ -21,5 +21,8 @@ struct
   val base_tenv = Symbol.enter(Symbol.enter(Symbol.empty,
                         Symbol.symbol "int", Types.INT),
                         Symbol.symbol "string", Types.STRING)
-  val base_venv = Symbol.empty
+  val base_venv = Symbol.enter(Symbol.empty,
+                               Symbol.symbol "printi",
+                               FunEntry {formals = [Types.INT],
+                                         result = Types.UNIT})
 end
